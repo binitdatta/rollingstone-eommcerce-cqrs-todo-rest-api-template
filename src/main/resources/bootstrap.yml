@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: product-rating-service  
+  cloud:
+    enabled: true
+    config:
+      failFast: false
+      retry:
+        maxAttempts: 20

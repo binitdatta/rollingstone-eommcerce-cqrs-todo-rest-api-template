@@ -1,0 +1,6 @@
+package com.solstice.command;
+
+public enum ResultCode {
+
+	OPERATION_UNKNOWN, OPERATION_SUCCESS, OPERATION_FAILURE
+}
