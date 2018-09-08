@@ -1,0 +1,18 @@
+version: '2'
+services:
+  rollingstone-eommcerce-cqrs-todo-rest-api-template:
+    environment:
+      CONFIG_SERVICE_PASSWORD: detachment
+      SPRING_PROFILES_ACTIVE: dev
+    image: 107222267664.dkr.ecr.us-west-2.amazonaws.com/rollingstone-eommcerce-cqrs-todo-rest-api-template
+    mem_limit: 1073741824
+    cpu_shares: 100
+    container_name: rollingstone-eommcerce-cqrs-todo-rest-api-template
+    restart: always
+    ports:
+      - "8082:8082"
+      - "9082:9082"
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "10"
