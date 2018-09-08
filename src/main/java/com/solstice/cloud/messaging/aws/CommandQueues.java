@@ -21,6 +21,8 @@ public class CommandQueues {
     private static final String addressQQueue = "Address_Command_Queue";
   
     private static final String debugQueue = "Debug_Queue";
+    private static final String todoQueue = "TODO_Queue";
+
 
 
     public static  Map<String, String> CommandQueuesMap;
@@ -57,6 +59,9 @@ public class CommandQueues {
         
         CommandQueuesMap.put(GenericCommandType.CREATE_ADDRESS.toString(), checkoutQQueue);
         CommandQueuesMap.put(GenericCommandType.UPDATE_ADDRESS.toString(), checkoutQQueue);
+
+		CommandQueuesMap.put(GenericCommandType.CREATE_TODO.toString(), todoQueue);
+        CommandQueuesMap.put(GenericCommandType.UPDATE_TODO.toString(), todoQueue);
 
      
         CommandQueuesMap.put(GenericCommandType.DEBUG.toString(), debugQueue);
