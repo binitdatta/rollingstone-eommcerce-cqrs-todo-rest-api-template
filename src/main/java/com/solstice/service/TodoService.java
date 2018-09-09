@@ -7,7 +7,9 @@ import java.util.stream.StreamSupport;
 
 import com.solstice.domain.Todo;
 import com.solstice.repository.TodoRepository;
+import org.springframework.stereotype.Service;
 
+@Service
 public class TodoService {
 
 	TodoRepository todoRepository;
