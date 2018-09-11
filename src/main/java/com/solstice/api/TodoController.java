@@ -131,6 +131,12 @@ public class TodoController {
 
 	}
 	
+	@DeleteMapping("solstice-ecommerce/todo/{id}")
+	@ResponseBody
+	public Todo deleteTodo(@RequestParam Long todoId){
+		return todoService.deleteTodo(todoId);
+	}
+	
 	private String buildErrorMessage(Set<ConstraintViolation<Todo>> constraintViolations) {
 		String message = "";
 		if (constraintViolations == null || constraintViolations.size() == 0)
