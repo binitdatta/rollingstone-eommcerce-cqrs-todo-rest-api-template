@@ -1,4 +1,0 @@
-management:
-  port: 9080
-  security:
-    enabled: false

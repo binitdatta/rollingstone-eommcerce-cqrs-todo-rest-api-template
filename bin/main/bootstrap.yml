@@ -1,6 +1,6 @@
 spring:
   application:
-    name: product-rating-service  
+    name: rollingstone-eommcerce-cqrs-todo-rest-api-template  
   cloud:
     enabled: true
     config:

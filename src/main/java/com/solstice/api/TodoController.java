@@ -13,19 +13,24 @@ import javax.validation.ValidatorFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.solstice.command.GenericCommandHeader;
 import com.solstice.command.GenericCommandType;
 import com.solstice.command.TodoCommand;
 import com.solstice.command.interfaces.GenericCommandBus;
+import com.solstice.domain.RSResponse;
 import com.solstice.domain.Todo;
 import com.solstice.service.TodoService;
 
@@ -50,28 +55,35 @@ public class TodoController {
 
 	@GetMapping("solstice-ecommerce/todo")
 	@ResponseBody
+	@ResponseStatus(HttpStatus.OK)
 	public List<Todo> getTodos(){
 		return todoService.getAllTodos();
 	}
 	
 	@GetMapping("solstice-ecommerce/todo/{id}")
 	@ResponseBody
+	@ResponseStatus(HttpStatus.OK)
 	public Todo getTodo(@RequestParam Long todoId){
 		return todoService.getTodo(todoId);
 	}
 	
 	
 	@PostMapping("solstice-ecommerce/todo")
-	public ResponseEntity<?> createTodo(@RequestBody Todo todo) {
+	@ResponseStatus(HttpStatus.CREATED)
+	@ResponseBody
+	public RSResponse createTodo(@RequestBody Todo todo) {
 
+		RSResponse<Todo> rsResponse = new RSResponse<Todo>();
+		
 		log.info("Received request to create Todo");
 		Set<ConstraintViolation<Todo>> constraintViolations = validator.validate(todo);
 
 		String errorMessage = buildErrorMessage(constraintViolations);
 
 		if (!errorMessage.isEmpty()) {
-			log.error("Error when creating product rating: " + errorMessage);
-			return ResponseEntity.unprocessableEntity().body(errorMessage);
+			log.error("Error when creating todo: " + errorMessage);
+			rsResponse.setErrorMessage("Error when creating todo: " + errorMessage);
+			return rsResponse;
 		} else {
 			/*
 			 * The Command is a standard design pattern through which data and code is transferred from the client to the processing server. In 
@@ -100,22 +112,28 @@ public class TodoController {
 			commandBus.send(todoCommand);
 			
 			log.info("Todo sent to queue for creation");
-			return ResponseEntity.ok("Sent to Todo Create Queue");
+			rsResponse.setMessage("Todo sent to queue for creation");
+			rsResponse.setPayload(todo);
+			return rsResponse;
 		}
 
 	}
 
 	
 	@PutMapping("solstice-ecommerce/todo/{id}")
-	ResponseEntity<?> updateTodo(@RequestBody Todo todo) {
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	@ResponseBody
+	RSResponse updateTodo(@RequestBody Todo todo) {
 
-		log.info("Received request to update product rating");
+		RSResponse<Todo> rsResponse = new RSResponse<Todo>();
+		
+		log.info("Received request to update todo");
 		Set<ConstraintViolation<Todo>> constraintViolations = validator.validate(todo);
 		String errorMessage = buildErrorMessage(constraintViolations);
 		if (!errorMessage.isEmpty())
 		{
-			log.error("Error when updating Todo: " + errorMessage);
-			return ResponseEntity.unprocessableEntity().body(errorMessage);
+			rsResponse.setErrorMessage("Error when creating todo: " + errorMessage);
+			return rsResponse;
 		}
 		else
 		{
@@ -125,17 +143,42 @@ public class TodoController {
 			GenericCommandHeader header = new GenericCommandHeader(GenericCommandType.UPDATE_TODO.toString(),SCHEMA_VERSION, new Timestamp(System.currentTimeMillis()));
 			command.setHeader(header);
 			commandBus.send(command);
-			log.info("Todo sent to queue for update");
-			return ResponseEntity.ok("Sent to Update Queue");
+
+			rsResponse.setMessage("Todo sent to queue for update");
+			rsResponse.setPayload(todo);
+			return rsResponse;
 		}
 
 	}
 	
 	@DeleteMapping("solstice-ecommerce/todo/{id}")
-	@ResponseBody
-	public Todo deleteTodo(@RequestParam Long todoId){
-		return todoService.deleteTodo(todoId);
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	RSResponse deleteTodo(@PathVariable Long id) {
+		RSResponse<Todo> rsResponse = new RSResponse<Todo>();
+		log.info("Received request to delete todo");
+		Todo todo = todoService.getTodo(id);
+		if (todo == null)
+		{
+			log.error("Error when deleting Todo: ");
+			rsResponse.setErrorMessage("Error when deleting todo as Todo is not found: ");
+			return rsResponse;
+		}
+		else
+		{
+			TodoCommand command = new TodoCommand();
+			command.setTodo(todo);
+			command.setId(UUID.randomUUID());
+			GenericCommandHeader header = new GenericCommandHeader(GenericCommandType.DELETE_TODO.toString(),SCHEMA_VERSION, new Timestamp(System.currentTimeMillis()));
+			command.setHeader(header);
+			commandBus.send(command);
+			rsResponse.setMessage("Todo sent to queue for delete");
+			rsResponse.setPayload(todo);
+			return rsResponse;
+		}
+
 	}
+	
+	
 	
 	private String buildErrorMessage(Set<ConstraintViolation<Todo>> constraintViolations) {
 		String message = "";

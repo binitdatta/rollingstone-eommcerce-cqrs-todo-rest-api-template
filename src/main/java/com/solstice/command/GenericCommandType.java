@@ -29,6 +29,7 @@ public enum GenericCommandType {
 	UPDATE_SPU,
 	DEBUG,
 	CREATE_TODO,
-	UPDATE_TODO
+	UPDATE_TODO,
+	DELETE_TODO
 
 }
