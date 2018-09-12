@@ -29,7 +29,7 @@ public class RestControllerAspect {
 
 	Counter deleteTodoCounter = Metrics.counter("com.rollingstone.api.TodoController.deleteTodo");
 
-	@Before("execution(public * com.rollingstone.controller.*Controller.*(..))")
+	@Before("execution(public * com.rollingstone.api.*Controller.*(..))")
 	public void logBeforeRestCall(JoinPoint pjp) throws Throwable {
 		logger.info(":::::AOP Before for Any Controller REST call:::::" + pjp);
 		genericAPICallCounter.increment();
