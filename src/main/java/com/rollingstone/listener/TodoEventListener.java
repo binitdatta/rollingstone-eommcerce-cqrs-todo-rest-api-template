@@ -10,7 +10,7 @@ import com.rollingstone.service.event.TodoServiceEvent;
 
 
 @Component
-public class TodoEventListener implements ApplicationListener<TodoServiceEvent> {
+public class TodoEventListener { // implements ApplicationListener<TodoServiceEvent> {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	@EventListener
